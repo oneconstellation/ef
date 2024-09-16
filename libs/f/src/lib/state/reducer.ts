@@ -1,10 +1,11 @@
+import { FieldType } from '../common/types';
 import * as Action from './consts';
 
 type Name = string;
 
 interface FieldState {
   name: string;
-  value: string | boolean | number;
+  value: FieldType;
   touched: boolean;
   disabled: boolean;
   hasError: boolean;
@@ -36,7 +37,10 @@ export function reducer(state: State, action: { type: string; payload: any }) {
       return {
         ...state,
         fields: {
-          ...action.payload.map(createFieldState).reduce((a, v) => ({ ...a, [v.name]: v }), {}),
+          ...action.payload
+            .map(createFieldState)
+            .reduce((fields: Record<string, FieldState>, field: FieldState) =>
+              ({ ...fields, [field.name]: field }), {}),
         },
       };
 

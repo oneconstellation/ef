@@ -2,17 +2,12 @@ import { ChangeEvent, useCallback, useEffect, FocusEvent } from 'react';
 import { pickValue } from '../utils/pickValue';
 import { useFormState } from './useFormState';
 import { useValidators } from './useValidators';
+import { ValidatorFn } from '../common/types';
 
-interface ErrorState {
-  hasError: boolean;
-  name: string;
-}
-
-type FieldTypes = string | number | Date | FileList | null | boolean;
-type ValidatorFn = (value: FieldTypes) => ErrorState;
 type FieldOptions = {
   disabled?: boolean;
 };
+
 type Fields = Record<string, [(string | boolean | number)?, ValidatorFn[]?, options?: FieldOptions]>;
 
 export const useForm = <F extends Fields>(fields: F) => {
