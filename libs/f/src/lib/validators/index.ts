@@ -1,9 +1,6 @@
-const isString = (value: unknown) => typeof value === 'string';
+import { ErrorState } from "../common/types";
 
-interface ErrorState {
-  hasError: boolean;
-  name: string;
-}
+const isString = (value: unknown) => typeof value === 'string';
 
 export const minLength =
   (minLength: number) =>

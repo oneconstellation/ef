@@ -1,12 +1,5 @@
 import { useRef } from 'react';
-
-interface ErrorState {
-  hasError: boolean;
-  name: string;
-}
-type FieldTypes = string | number | Date | FileList | null | boolean;
-
-type ValidatorFn = (value: FieldTypes) => ErrorState;
+import { ValidatorFn } from '../common/types';
 
 export const useValidators = () => {
   const validators = useRef<Record<string, ValidatorFn[]>>({});
