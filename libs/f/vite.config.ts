@@ -1,4 +1,3 @@
-/// <reference types='vitest' />
 import { defineConfig } from 'vite';
 import react from '@vitejs/plugin-react';
 import dts from 'vite-plugin-dts';
@@ -48,8 +47,11 @@ export default defineConfig({
   },
 
   test: {
-    environment: 'jsdom',
-    globals: true,
     setupFiles: './tests/setup.ts',
+    globals: true,
+    environment: 'jsdom',
+    include: ['src/**/*.{test,spec}.{js,mjs,cjs,ts,mts,cts,jsx,tsx}'],
+    reporters: ['default'],
+    coverage: { reportsDirectory: '../../coverage/libs/f', provider: 'v8' },
   },
 });
