@@ -1,4 +1,4 @@
-import { useForm, minLength, maxLength } from '@lib/f';
+import { useForm, minLength, maxLength, required } from '@lib/f';
 
 export function App() {
   const f = useForm({
@@ -18,8 +18,25 @@ export function App() {
     range: [],
   });
 
+  const ff = useForm(
+    {
+      login: ['', [required(), minLength(3)]],
+      password: ['', [required(), minLength(3)]],
+    },
+    {
+      onSubmit(values) {
+        console.log(values);
+      },
+    }
+  );
+
   return (
     <main className="container">
+      <form {...ff.form}>
+        <input type="text" placeholder="login" {...ff.field('login')} autoComplete={'username'} />
+        <input type="password" placeholder="password" {...ff.field('password')} autoComplete="current-password" />
+        <input type="submit" />
+      </form>
       <fieldset>
         <legend>dump</legend>
         <pre>
