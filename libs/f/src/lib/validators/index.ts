@@ -1,35 +1,16 @@
-import { ErrorState } from "../common/types";
+import { createValidator } from '../utils/createValidator';
+import { isString } from '../utils/isUtils';
 
-const isString = (value: unknown) => typeof value === 'string';
+export const minLength = createValidator<number>('minLength', (value, minLength) => {
+  if (isString(value)) {
+    return value.length >= minLength;
+  }
+  return false;
+});
 
-export const minLength =
-  (minLength: number) =>
-  (value: unknown): ErrorState => {
-    if (isString(value)) {
-      return {
-        hasError: value.length <= minLength,
-        name: 'minLength',
-      };
-    }
-
-    return {
-      hasError: false,
-      name: 'minLength',
-    };
-  };
-
-export const maxLength =
-  (maxLength: number) =>
-  (value: unknown): ErrorState => {
-    if (isString(value)) {
-      return {
-        hasError: value.length > maxLength,
-        name: 'maxLength',
-      };
-    }
-
-    return {
-      hasError: false,
-      name: 'maxLength',
-    };
-  };
+export const maxLength = createValidator<number>('maxLength', (value, maxLength) => {
+  if (isString(value)) {
+    return value.length <= maxLength;
+  }
+  return false;
+});
