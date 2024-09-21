@@ -4,6 +4,7 @@
   "license": "MIT",
   "scripts": {
     "test": "vitest -c libs/f/vite.config.ts --run",
+    "test:watch": "vitest -c libs/f/vite.config.ts",
     "prepare": "husky"
   },
   "private": true,
