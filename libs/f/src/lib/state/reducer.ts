@@ -16,14 +16,16 @@ interface State {
   fields: Record<Name, FieldState>;
 }
 
-const createFieldState = (field: Pick<FieldState, 'name' | 'value' | 'disabled'>): FieldState => {
+const createFieldState = (
+  field: Pick<FieldState, 'name' | 'value' | 'disabled' | 'hasError' | 'errors'>
+): FieldState => {
   return {
     name: field.name,
     value: field.value,
     touched: false,
     disabled: field.disabled ?? false,
-    hasError: false,
-    errors: null,
+    hasError: field.hasError ?? false,
+    errors: field.errors ?? null,
   };
 };
 
@@ -39,8 +41,10 @@ export function reducer(state: State, action: { type: string; payload: any }) {
         fields: {
           ...action.payload
             .map(createFieldState)
-            .reduce((fields: Record<string, FieldState>, field: FieldState) =>
-              ({ ...fields, [field.name]: field }), {}),
+            .reduce(
+              (fields: Record<string, FieldState>, field: FieldState) => ({ ...fields, [field.name]: field }),
+              {}
+            ),
         },
       };
 

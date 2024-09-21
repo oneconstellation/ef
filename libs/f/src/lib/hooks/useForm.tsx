@@ -1,8 +1,8 @@
-import { ChangeEvent, useCallback, useEffect, FocusEvent } from 'react';
+import { ChangeEvent, useCallback, useEffect, FocusEvent, FormEvent } from 'react';
 import { pickValue } from '../utils/pickValue';
 import { useFormState } from './useFormState';
 import { useValidators } from './useValidators';
-import { ValidatorFn } from '../common/types';
+import { FieldType, ValidatorFn } from '../common/types';
 
 type FieldOptions = {
   disabled?: boolean;
@@ -10,17 +10,33 @@ type FieldOptions = {
 
 type Fields = Record<string, [(string | boolean | number)?, ValidatorFn[]?, options?: FieldOptions]>;
 
-export const useForm = <F extends Fields>(fields: F) => {
+type Options = {
+  onSubmit: (values: Record<string, FieldType>) => void;
+};
+
+export const useForm = <F extends Fields>(fields: F, options?: Options) => {
   const { setup, state, change, markAsTouched, disable, enable, setErrors } = useFormState();
   const { registerValidator, validate } = useValidators();
 
+  const values = Object.entries(state.fields)
+    .map(([key, fieldState]) => ({
+      [key]: (fieldState as any).value,
+    }))
+    .reduce(
+      (current, acc) => ({
+        ...acc,
+        ...current,
+      }),
+      {}
+    );
+
   const onChangeCallback = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
-      const field = event.target.name;
-      const value = pickValue(event).value;
+      const { name } = event.target;
+      const { value } = pickValue(event);
 
-      setErrors(field, validate(field, value));
-      change(field, value);
+      setErrors(name, validate(name, value));
+      change(name, value);
     },
     [validate, change, setErrors]
   );
@@ -35,16 +51,36 @@ export const useForm = <F extends Fields>(fields: F) => {
     [state.fields, markAsTouched]
   );
 
+  const onSubmitCallback = useCallback(
+    (event: FormEvent<HTMLFormElement>) => {
+      event.preventDefault();
+
+      const isValid = Object.entries(state.fields)
+        .map(([, fieldState]) => (fieldState as any).hasError)
+        .every((hasError) => !hasError);
+
+      if (isValid && options?.onSubmit) {
+        options?.onSubmit(values);
+      }
+    },
+    [state.fields, values, options]
+  );
+
   useEffect(() => {
     setup(
       Object.entries(fields).map(([name, [value, validators, options]]) => {
         if (validators?.length) {
           registerValidator({ [name]: validators });
         }
+
+        const errors = validate(name, value);
+
         return {
           name,
           value: value ?? '',
           ...options,
+          errors,
+          hasError: Object.values(errors).some(Boolean),
         };
       })
     );
@@ -52,9 +88,10 @@ export const useForm = <F extends Fields>(fields: F) => {
 
   return {
     all: state,
-    values: Object.entries(state.fields).map(([key, fieldState]) => ({
-      [key]: (fieldState as any).value,
-    })),
+    values,
+    form: {
+      onSubmit: onSubmitCallback,
+    },
     field: (field: keyof F) => ({
       value: state.fields[field]?.value ?? '',
       name: state.fields[field]?.name,
