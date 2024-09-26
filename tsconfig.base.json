@@ -15,7 +15,8 @@
     "skipDefaultLibCheck": true,
     "baseUrl": ".",
     "paths": {
-      "@lib/f": ["libs/f/src/index.ts"]
+      "@lib/f": ["libs/f/src/index.ts"],
+      "@oneconstellation/ef": ["libs/ef/src/index.ts"]
     }
   },
   "exclude": ["node_modules", "tmp"]
