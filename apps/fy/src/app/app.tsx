@@ -1,4 +1,4 @@
-import { useForm, minLength, maxLength, required } from '@lib/f';
+import { useForm, minLength, maxLength, required } from '@oneconstellation/ef';
 
 export function App() {
   const f = useForm({

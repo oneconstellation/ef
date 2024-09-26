@@ -1,0 +1,12 @@
+{
+  "name": "@oneconstellation/ef",
+  "version": "0.0.1",
+  "dependencies": {},
+  "peerDependencies": {
+    "react": "^18.0.0",
+    "react-dom": "^18.0.0"
+  },
+  "main": "./index.js",
+  "module": "./index.mjs",
+  "typings": "./index.d.ts"
+}
