@@ -7,6 +7,8 @@
     "test:watch": "vitest",
     "prepare": "node_modules/.bin/husky",
     "build": "nx run ef:build",
+    "prepublish": "npm run test && npm run build",
+    "publish": "nx run ef:nx-release-publish",
     "verdaccio": "verdaccio"
   },
   "private": true,
