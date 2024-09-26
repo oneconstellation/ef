@@ -9,7 +9,7 @@
     "build": "nx run ef:build",
     "prepublish": "npm run test && npm run build",
     "publish": "nx run ef:nx-release-publish",
-    "verdaccio": "verdaccio"
+    "verdaccio": "nx run @f-demo/source:local-registry"
   },
   "private": true,
   "dependencies": {
