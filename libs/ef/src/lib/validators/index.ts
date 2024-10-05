@@ -36,7 +36,25 @@ export const min = createValidator<number>('min', (value, min) => {
   return parsedValue >= min;
 });
 
-export const max = createValidator<number>('max', (value, max) => Number(value) <= max);
+export const max = createValidator<number>('max', (value, max) => {
+  if (isEmpty(value) || isEmpty(max)) {
+    /**
+     * if is empty, pass as valid
+     */
+    return true;
+  }
+
+  const parsedValue = Number.parseFloat(value as string);
+  
+  if (isNaN(parsedValue)) {
+    /**
+     * if is not numer, pass as valid
+     */
+    return true;
+  }
+
+  return parsedValue <= max;
+});
 
 export const email = createValidator('email', (value) => EMAIL_REGEXP.test(String(value)));
 

@@ -88,6 +88,74 @@ describe('validators', () => {
       });
     });
   });
+  describe('max', () => {
+    test('should not error on empty string', () => {
+      expect(Validators.max(2)('').hasError).toBe(false);
+    });
+    test('should not error on empty string', () => {
+      expect(Validators.max('' as any)(2).hasError).toBe(false);
+    });
+    test('should not error on null', () => {
+      expect(Validators.max(2)(null).hasError).toBe(false);
+    });
+    test('should not error on null arg', () => {
+      expect(Validators.max(null as any)(2).hasError).toBe(false);
+    });
+    test('should not error on undefined', () => {
+      expect(Validators.max(2)(undefined as any).hasError).toBe(false);
+    });
+    test('should not error on undefined arg', () => {
+      expect(Validators.max(undefined)(2).hasError).toBe(false);
+    });
+    test('should not error on NaN', () => {
+      expect(Validators.max(2)('a').hasError).toBe(false);
+    });
+    test('should not error on empty array', () => {
+      expect(Validators.max(2)([] as any).hasError).toBe(false);
+    });
+    test('should not error on empty object', () => {
+      expect(Validators.max(2)({} as any).hasError).toBe(false);
+    });
+    test('should not error on Date object', () => {
+      expect(Validators.max(2)(new Date()).hasError).toBe(false);
+    });
+    test('should not error on File', () => {
+      expect(Validators.max(2)(getFile() as any).hasError).toBe(false);
+    });
+    test('should not error on FileList', () => {
+      expect(Validators.max(2)(getFileList()).hasError).toBe(false);
+    });
+    test('should not error on smaller than required number', () => {
+      expect(Validators.max(2)(1).hasError).toBe(false);
+    });
+    test('should not error on smaller than required float number', () => {
+      expect(Validators.max(2.5)(2.1).hasError).toBe(false);
+    });
+    test('should not error on equal value', () => {
+      expect(Validators.max(2)(2).hasError).toBe(false);
+    });
+    test('should not error on equal string value', () => {
+      expect(Validators.max(2)('2').hasError).toBe(false);
+    });
+    test('should error on bigger value', () => {
+      expect(Validators.max(2)(3)).toEqual({
+        hasError: true,
+        name: 'max',
+      });
+    });
+    test('should error on bigger string value', () => {
+      expect(Validators.max(2)('3')).toEqual({
+        hasError: true,
+        name: 'max',
+      });
+    });
+    test('should error on bigger float value', () => {
+      expect(Validators.max(3.3)(4.2)).toEqual({
+        hasError: true,
+        name: 'max',
+      });
+    });
+  });
 });
 
 describe('basics', () => {
@@ -115,19 +183,6 @@ describe('basics', () => {
 
     expect(invalid.hasError).toBe(true);
     expect(invalid.name).toBe('maxLength');
-  });
-
-  test('should correctly validate - max', () => {
-    const validate = Validators.max(5);
-
-    const valid = validate(4);
-    const invalid = validate(10);
-
-    expect(valid.hasError).toBe(false);
-    expect(valid.name).toBe('max');
-
-    expect(invalid.hasError).toBe(true);
-    expect(invalid.name).toBe('max');
   });
 
   test('should correctly validate - email', () => {
