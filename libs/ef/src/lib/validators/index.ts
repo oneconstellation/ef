@@ -3,17 +3,27 @@ import { createValidator } from '../utils/createValidator';
 import { isString, isEmpty } from '../utils/isUtils';
 
 export const minLength = createValidator<number>('minLength', (value, minLength) => {
-  if (isString(value)) {
+  if (!minLength || Number.isNaN(minLength)) {
+    return true;
+  }
+
+  if (isString(value) || Array.isArray(value)) {
     return value.length >= minLength;
   }
-  return false;
+
+  return true;
 });
 
 export const maxLength = createValidator<number>('maxLength', (value, maxLength) => {
-  if (isString(value)) {
+  if (!maxLength || Number.isNaN(minLength)) {
+    return true;
+  }
+
+  if (isString(value) || Array.isArray(value)) {
     return value.length <= maxLength;
   }
-  return false;
+
+  return true;
 });
 
 export const min = createValidator<number>('min', (value, min) => {
@@ -56,8 +66,26 @@ export const max = createValidator<number>('max', (value, max) => {
   return parsedValue <= max;
 });
 
-export const email = createValidator('email', (value) => EMAIL_REGEXP.test(String(value)));
+export const email = createValidator('email', (value) => {
+  if (isEmpty(value)) {
+    /**
+     * if is empty, pass as valid
+     */
+    return true;
+  }
+
+  if (isString(value)) {
+    return EMAIL_REGEXP.test(String(value))
+  } 
+
+  return true
+});
 
 export const required = createValidator('required', (value) => {
-  return !(value === null || ((typeof value === 'string' || Array.isArray(value)) && value.length === 0));
+  return !(
+    value === null || 
+    value === undefined || 
+    Object.keys(value).length === 0 && value.constructor === Object ||
+    ((typeof value === 'string' || Array.isArray(value)) && value.length === 0)
+  );
 });
