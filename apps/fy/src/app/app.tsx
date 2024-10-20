@@ -22,7 +22,15 @@ export function App() {
                     {({ isActive }) => (
                       <li className={`menu-item ${isActive && 'menu-active'}`}>
                         <IconDirectionSignFilled />
-                        <span>login</span>
+                        <span>Login</span>
+                      </li>
+                    )}
+                  </NavLink>
+                  <NavLink to={'/file'}>
+                    {({ isActive }) => (
+                      <li className={`menu-item ${isActive && 'menu-active'}`}>
+                        <IconDirectionSignFilled />
+                        <span>File</span>
                       </li>
                     )}
                   </NavLink>

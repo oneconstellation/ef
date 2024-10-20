@@ -1,6 +1,6 @@
-import { createBrowserRouter } from "react-router-dom";
+import { createBrowserRouter } from 'react-router-dom';
 import * as Page from './pages';
-import { App } from "./app/app";
+import { App } from './app/app';
 
 export const router = createBrowserRouter([
   {
@@ -9,8 +9,12 @@ export const router = createBrowserRouter([
     children: [
       {
         path: '/login',
-        element: <Page.LoginDemoPage />
-      }
-    ]
-  }
-])
+        element: <Page.LoginDemoPage />,
+      },
+      {
+        path: '/file',
+        element: <Page.FileDemoPage />,
+      },
+    ],
+  },
+]);
