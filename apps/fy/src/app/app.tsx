@@ -34,6 +34,14 @@ export function App() {
                       </li>
                     )}
                   </NavLink>
+                  <NavLink to={'/range'}>
+                    {({ isActive }) => (
+                      <li className={`menu-item ${isActive && 'menu-active'}`}>
+                        <IconDirectionSignFilled />
+                        <span>Range</span>
+                      </li>
+                    )}
+                  </NavLink>
                 </ul>
               </section>
             </nav>

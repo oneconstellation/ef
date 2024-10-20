@@ -15,6 +15,10 @@ export const router = createBrowserRouter([
         path: '/file',
         element: <Page.FileDemoPage />,
       },
+      {
+        path: '/range',
+        element: <Page.RangeDemoPage />,
+      },
     ],
   },
 ]);
