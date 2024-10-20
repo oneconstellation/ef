@@ -44,7 +44,7 @@ export function App() {
           </section>
         </aside>
       </div>
-      <div className="flex flex-col p-4 w-full">
+      <div className="flex p-4 w-full h-full justify-center">
         <Outlet />
       </div>
     </div>
