@@ -17,7 +17,9 @@ export default defineConfig({
     port: 4300,
     host: 'localhost',
   },
-
+  optimizeDeps: {
+    include: ["@tabler/icons-react"],
+  },
   plugins: [react(), nxViteTsPaths()],
 
   // Uncomment this if you are using workers.
