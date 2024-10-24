@@ -2,8 +2,12 @@ import { useForm } from '@oneconstellation/ef';
 
 export const RangeDemoPage = () => {
   const form = useForm({
-    range: [],
+    range: [, , { watch: true }],
   });
+
+  const getValue = () => {
+    console.log(form.get('range').value());
+  };
 
   return (
     <div className="flex max-w-full w-full card bg-backgroundSecondary">
@@ -20,6 +24,11 @@ export const RangeDemoPage = () => {
                     </div>
                   </div>
                 </form>
+              </div>
+              <div>
+                <button className="btn btn-primary" onClick={() => getValue()}>
+                  get value
+                </button>
               </div>
             </div>
           </div>

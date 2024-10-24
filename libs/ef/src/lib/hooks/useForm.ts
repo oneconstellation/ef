@@ -1,4 +1,4 @@
-import { ChangeEvent, useCallback, useEffect, FocusEvent, FormEvent } from 'react';
+import { ChangeEvent, useCallback, useEffect, FocusEvent, FormEvent, useRef } from 'react';
 import { pickValue } from '../utils/pickValue';
 import { useFormState } from './useFormState';
 import { useValidators } from './useValidators';
@@ -6,6 +6,7 @@ import { FieldType, ValidatorFn } from '../common/types';
 
 type FieldOptions = {
   disabled?: boolean;
+  watch?: boolean;
 };
 
 type Fields = Record<string, [(string | boolean | number)?, ValidatorFn[]?, options?: FieldOptions]>;
@@ -15,6 +16,7 @@ type Options = {
 };
 
 export const useForm = <F extends Fields>(fields: F, options?: Options) => {
+  const formRef = useRef<HTMLFormElement>();
   const { setup, state, change, markAsTouched, disable, enable, setErrors } = useFormState();
   const { registerValidator, validate } = useValidators();
 
@@ -91,13 +93,20 @@ export const useForm = <F extends Fields>(fields: F, options?: Options) => {
     values,
     form: {
       onSubmit: onSubmitCallback,
+      ref: formRef,
     },
     field: (field: keyof F) => ({
-      value: state.fields[field]?.value ?? '',
       name: state.fields[field]?.name,
-      onChange: onChangeCallback,
       onBlur: onBlurCallback,
       disabled: state.fields[field]?.disabled,
+      ...(state.fields[field]?.watch
+        ? {
+            onChange: onChangeCallback,
+            value: state.fields[field]?.value ?? '',
+          }
+        : {
+            defaultValue: state.fields[field]?.value,
+          }),
     }),
     radio: (field: keyof F, value: string) => ({
       type: 'radio',
@@ -121,6 +130,15 @@ export const useForm = <F extends Fields>(fields: F, options?: Options) => {
       ...state.fields[field],
       disable: () => disable(field),
       enable: () => enable(field),
+      value: () => {
+        const value = (formRef.current?.elements[state.fields[field].name] as HTMLInputElement)?.value;
+
+        if (!state.fields[field].watch) {
+          change(state.fields[field].name, value);
+        }
+
+        return value;
+      },
     }),
     value: (field: keyof F) => state.fields[field]?.value ?? '',
   };

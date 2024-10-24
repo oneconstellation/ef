@@ -10,6 +10,7 @@ interface FieldState {
   disabled: boolean;
   hasError: boolean;
   errors: Record<string, boolean> | null;
+  watch: boolean;
 }
 
 interface State {
@@ -17,7 +18,7 @@ interface State {
 }
 
 const createFieldState = (
-  field: Pick<FieldState, 'name' | 'value' | 'disabled' | 'hasError' | 'errors'>
+  field: Pick<FieldState, 'name' | 'value' | 'disabled' | 'hasError' | 'errors' | 'watch'>
 ): FieldState => {
   return {
     name: field.name,
@@ -26,6 +27,7 @@ const createFieldState = (
     disabled: field.disabled ?? false,
     hasError: field.hasError ?? false,
     errors: field.errors ?? null,
+    watch: field.watch ?? true,
   };
 };
 
