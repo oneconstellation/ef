@@ -24,7 +24,7 @@ const createFieldState = (
     name: field.name,
     value: field.value,
     touched: false,
-    disabled: field.disabled ?? false,
+    disabled: field?.disabled ?? false,
     hasError: field.hasError ?? false,
     errors: field.errors ?? null,
     watch: field.watch ?? true,
