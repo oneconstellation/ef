@@ -2,7 +2,8 @@ import { useForm } from '@oneconstellation/ef';
 
 export const RangeDemoPage = () => {
   const form = useForm({
-    range: [, , { watch: true }],
+    range: [],
+    watchedRange: [],
   });
 
   const getValue = () => {
@@ -11,28 +12,54 @@ export const RangeDemoPage = () => {
 
   return (
     <div className="flex max-w-full w-full card bg-backgroundSecondary">
-      <div className="card-body flex flex-col gap-4 w-full">
-        <div>
-          <h1 className="text-3xl font-semibold mb-3">Demo</h1>
-          <div className="card">
-            <div className="card-body">
-              <div className="mx-auto flex w-full max-w-sm flex-col gap-6">
-                <form className="form-group" {...form.form}>
-                  <div className="form-field">
-                    <div className="form-control">
-                      <input type="range" className="range range-flat-primary" {...form.field('range')} />
+      <div className="card-body flex flex-col w-full">
+        <form {...form.form}>
+          <div>
+            <h1 className="text-3xl font-semibold mb-3">Value on demand</h1>
+            <div className="card">
+              <div className="card-body">
+                <div className="mx-auto flex w-full max-w-sm flex-col gap-6">
+                  <div className="form-group">
+                    <div className="form-field">
+                      <div className="form-control">
+                        <input
+                          type="range"
+                          className="range range-flat-primary"
+                          {...form.field('range', { watch: false })}
+                        />
+                      </div>
                     </div>
                   </div>
-                </form>
-              </div>
-              <div>
-                <button className="btn btn-primary" onClick={() => getValue()}>
-                  get value
-                </button>
+                </div>
+                <div>
+                  <button className="btn btn-primary" onClick={() => getValue()}>
+                    get value
+                  </button>
+                </div>
               </div>
             </div>
           </div>
-        </div>
+          <div className="my-6">
+            <h1 className="text-3xl font-semibold mb-3">Watch changes</h1>
+            <div className="card">
+              <div className="card-body">
+                <div className="mx-auto flex w-full max-w-sm flex-col gap-6">
+                  <div className="form-group">
+                    <div className="form-field">
+                      <div className="form-control">
+                        <input
+                          type="range"
+                          className="range range-flat-primary"
+                          {...form.field('watchedRange', { watch: true })}
+                        />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </form>
         <div>
           <h1 className="text-3xl font-semibold mb-3">Output</h1>
           <code className="kbd block whitespace-pre overflow-hidden">{JSON.stringify(form.all, null, 4)}</code>

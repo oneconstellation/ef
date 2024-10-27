@@ -69,7 +69,7 @@ describe('basics', () => {
       })
     );
 
-    const { value } = result.current.field('test');
+    const { value } = result.current.field('test', { watch: true });
 
     expect(value).toBe(initialValue);
   });

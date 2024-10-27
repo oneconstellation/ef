@@ -9,14 +9,14 @@ type FieldOptions = {
   watch?: boolean;
 };
 
-type Fields = Record<string, [(string | boolean | number)?, ValidatorFn[]?, options?: FieldOptions]>;
+type Fields = Record<string, [(string | boolean | number)?, ValidatorFn[]?]>;
 
 type Options = {
   onSubmit: (values: Record<string, FieldType>) => void;
 };
 
 export const useForm = <F extends Fields>(fields: F, options?: Options) => {
-  const formRef = useRef<HTMLFormElement>();
+  const formRef = useRef<HTMLFormElement>(null);
   const { setup, state, change, markAsTouched, disable, enable, setErrors } = useFormState();
   const { registerValidator, validate } = useValidators();
 
@@ -31,6 +31,10 @@ export const useForm = <F extends Fields>(fields: F, options?: Options) => {
       }),
       {}
     );
+
+  const getFieldByFormRef = (field: keyof F) => {
+    return formRef.current?.elements.namedItem(field as string) as HTMLInputElement;
+  };
 
   const onChangeCallback = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
@@ -69,24 +73,25 @@ export const useForm = <F extends Fields>(fields: F, options?: Options) => {
   );
 
   useEffect(() => {
-    setup(
-      Object.entries(fields).map(([name, [value, validators, options]]) => {
-        if (validators?.length) {
-          registerValidator({ [name]: validators });
-        }
+    const initialState = Object.entries(fields).map(([name, [value, validators]]) => {
+      if (validators?.length) {
+        registerValidator({ [name]: validators });
+      }
 
-        const errors = validate(name, value);
+      const errors = validate(name, value);
+      const field = getFieldByFormRef(name);
 
-        return {
-          name,
-          value: value ?? '',
-          ...options,
-          errors,
-          hasError: Object.values(errors).some(Boolean),
-        };
-      })
-    );
-  }, []);
+      return {
+        name,
+        value: value ?? field?.value ?? '',
+        errors,
+        hasError: Object.values(errors).some(Boolean),
+        disabled: field?.disabled,
+      };
+    });
+
+    setup(initialState);
+  }, [formRef.current]);
 
   return {
     all: state,
@@ -95,11 +100,11 @@ export const useForm = <F extends Fields>(fields: F, options?: Options) => {
       onSubmit: onSubmitCallback,
       ref: formRef,
     },
-    field: (field: keyof F) => ({
+    field: (field: keyof F, options?: FieldOptions) => ({
       name: state.fields[field]?.name,
       onBlur: onBlurCallback,
       disabled: state.fields[field]?.disabled,
-      ...(state.fields[field]?.watch
+      ...(options?.watch
         ? {
             onChange: onChangeCallback,
             value: state.fields[field]?.value ?? '',
@@ -108,22 +113,22 @@ export const useForm = <F extends Fields>(fields: F, options?: Options) => {
             defaultValue: state.fields[field]?.value,
           }),
     }),
-    radio: (field: keyof F, value: string) => ({
+    radio: (field: keyof F, value: string, options?: Omit<FieldOptions, 'watch'>) => ({
       type: 'radio',
       name: state.fields[field]?.name,
       onChange: onChangeCallback,
+      onBlur: onBlurCallback,
       value,
       checked: state.fields[field]?.value === value,
-      onBlur: onBlurCallback,
       disabled: state.fields[field]?.disabled,
     }),
-    checkbox: (field: keyof F) => ({
+    checkbox: (field: keyof F, options?: Omit<FieldOptions, 'watch'>) => ({
       type: 'checkbox',
       name: state.fields[field]?.name,
       onChange: onChangeCallback,
+      onBlur: onBlurCallback,
       value: undefined,
       checked: !!state.fields[field]?.value,
-      onBlur: onBlurCallback,
       disabled: state.fields[field]?.disabled,
     }),
     get: (field: keyof F) => ({
@@ -131,11 +136,8 @@ export const useForm = <F extends Fields>(fields: F, options?: Options) => {
       disable: () => disable(field),
       enable: () => enable(field),
       value: () => {
-        const value = (formRef.current?.elements[state.fields[field].name] as HTMLInputElement)?.value;
-
-        if (!state.fields[field].watch) {
-          change(state.fields[field].name, value);
-        }
+        const value = getFieldByFormRef(field)?.value;
+        change(state.fields[field].name, value);
 
         return value;
       },
