@@ -1,21 +1,5 @@
-import { FieldType } from '../common/types';
+import { FieldState, State } from '../common/types';
 import * as Action from './consts';
-
-type Name = string;
-
-interface FieldState {
-  name: string;
-  value: FieldType;
-  touched: boolean;
-  disabled: boolean;
-  hasError: boolean;
-  errors: Record<string, boolean> | null;
-  watch: boolean;
-}
-
-interface State {
-  fields: Record<Name, FieldState>;
-}
 
 const createFieldState = (
   field: Pick<FieldState, 'name' | 'value' | 'disabled' | 'hasError' | 'errors' | 'watch'>
@@ -31,7 +15,7 @@ const createFieldState = (
   };
 };
 
-export const initialState = {
+export const initialState: State = {
   fields: {},
 };
 
