@@ -6,3 +6,21 @@ export interface ErrorState {
 }
 
 export type ValidatorFn = (value: FieldType) => ErrorState;
+
+export type Name = string;
+
+export interface FieldState {
+  name: string;
+  value: FieldType;
+  touched: boolean;
+  disabled: boolean;
+  hasError: boolean;
+  errors: Record<string, boolean> | null;
+  watch: boolean;
+}
+
+export interface State {
+  fields: Record<any, FieldState>;
+}
+
+export type AnyAction = any;

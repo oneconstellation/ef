@@ -15,9 +15,10 @@ type Options = {
   onSubmit: (values: Record<string, FieldType>) => void;
 };
 
-export const useForm = <F extends Fields>(fields: F, options?: Options) => {
+export const useForm = <FormFields extends Fields>(fields: FormFields, options?: Options) => {
   const formRef = useRef<HTMLFormElement>(null);
-  const { setup, state, change, markAsTouched, disable, enable, setErrors } = useFormState();
+  const { setup, state, change, markAsTouched, disable, enable, setErrors, getField } =
+    useFormState<keyof FormFields>();
   const { registerValidator, validate } = useValidators();
 
   const values = Object.entries(state.fields)
@@ -32,7 +33,7 @@ export const useForm = <F extends Fields>(fields: F, options?: Options) => {
       {}
     );
 
-  const getFieldByFormRef = (field: keyof F) => {
+  const getFieldByFormRef = (field: keyof FormFields) => {
     return formRef.current?.elements.namedItem(field as string) as HTMLInputElement;
   };
 
@@ -100,39 +101,39 @@ export const useForm = <F extends Fields>(fields: F, options?: Options) => {
       onSubmit: onSubmitCallback,
       ref: formRef,
     },
-    field: (field: keyof F, options?: FieldOptions) => ({
-      name: state.fields[field]?.name,
+    field: (field: keyof FormFields, options?: FieldOptions) => ({
+      name: getField(field)?.name,
       onBlur: onBlurCallback,
-      disabled: state.fields[field]?.disabled,
+      disabled: getField(field)?.disabled,
       ...(options?.watch
         ? {
             onChange: onChangeCallback,
-            value: state.fields[field]?.value ?? '',
+            value: getField(field)?.value ?? '',
           }
         : {
-            defaultValue: state.fields[field]?.value,
+            defaultValue: getField(field)?.value,
           }),
     }),
-    radio: (field: keyof F, value: string, options?: Omit<FieldOptions, 'watch'>) => ({
+    radio: (field: keyof FormFields, value: string, options?: Omit<FieldOptions, 'watch'>) => ({
       type: 'radio',
-      name: state.fields[field]?.name,
+      name: getField(field)?.name,
       onChange: onChangeCallback,
       onBlur: onBlurCallback,
       value,
-      checked: state.fields[field]?.value === value,
-      disabled: state.fields[field]?.disabled,
+      checked: getField(field)?.value === value,
+      disabled: getField(field)?.disabled,
     }),
-    checkbox: (field: keyof F, options?: Omit<FieldOptions, 'watch'>) => ({
+    checkbox: (field: keyof FormFields, options?: Omit<FieldOptions, 'watch'>) => ({
       type: 'checkbox',
-      name: state.fields[field]?.name,
+      name: getField(field)?.name,
       onChange: onChangeCallback,
       onBlur: onBlurCallback,
       value: undefined,
-      checked: !!state.fields[field]?.value,
-      disabled: state.fields[field]?.disabled,
+      checked: !!getField(field)?.value,
+      disabled: getField(field)?.disabled,
     }),
-    get: (field: keyof F) => ({
-      ...state.fields[field],
+    get: (field: keyof FormFields) => ({
+      ...getField(field),
       disable: () => disable(field),
       enable: () => enable(field),
       value: () => {
@@ -142,6 +143,6 @@ export const useForm = <F extends Fields>(fields: F, options?: Options) => {
         return value;
       },
     }),
-    value: (field: keyof F) => state.fields[field]?.value ?? '',
+    value: (field: keyof FormFields) => getField(field)?.value ?? '',
   };
 };
