@@ -7,7 +7,7 @@ export const RangeDemoPage = () => {
   });
 
   const getValue = () => {
-    console.log(form.get('range').value());
+    console.log(form.get('range').valueByRef());
   };
 
   return (

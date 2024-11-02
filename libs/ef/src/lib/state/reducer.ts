@@ -2,7 +2,7 @@ import { FieldState, State } from '../common/types';
 import * as Action from './consts';
 
 const createFieldState = (
-  field: Pick<FieldState, 'name' | 'value' | 'disabled' | 'hasError' | 'errors' | 'watch'>
+  field: Pick<FieldState, 'name' | 'value' | 'disabled' | 'hasError' | 'errors'>
 ): FieldState => {
   return {
     name: field.name,
@@ -11,7 +11,7 @@ const createFieldState = (
     disabled: field?.disabled ?? false,
     hasError: field.hasError ?? false,
     errors: field.errors ?? null,
-    watch: field.watch ?? true,
+    // watch: field.watch ?? true,
   };
 };
 
@@ -91,6 +91,18 @@ export function reducer(state: State, action: { type: string; payload: any }) {
             ...state.fields[action.payload.field],
             errors: action.payload.errors,
             hasError: Object.values(action.payload.errors).some(Boolean),
+          },
+        },
+      };
+
+    case Action.WATCH:
+      return {
+        ...state,
+        fields: {
+          ...state.fields,
+          [action.payload.field]: {
+            ...state.fields[action.payload.field],
+            watch: action.payload.watch,
           },
         },
       };

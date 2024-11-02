@@ -8,3 +8,4 @@ export const Disable = (payload: { field: string }) => createAction(A.DISABLE, p
 export const Enable = (payload: { field: string }) => createAction(A.ENABLE, payload);
 export const SetErrors = (payload: { field: string; errors: Record<string, boolean> }) =>
   createAction(A.SET_ERRORS, payload);
+export const SetWatch = (payload: { field: string; watch: boolean }) => createAction(A.WATCH, payload);
