@@ -1,25 +1,26 @@
-import { ChangeEvent, useCallback, useEffect, FocusEvent, FormEvent, useRef } from 'react';
+import { ChangeEvent, useCallback, FocusEvent, FormEvent, useRef } from 'react';
 import { pickValue } from '../utils/pickValue';
 import { useFormState } from './useFormState';
 import { useValidators } from './useValidators';
 import { FieldType, ValidatorFn } from '../common/types';
+import { useRunOnce } from './useRunOnce';
 
-type FieldOptions = {
-  disabled?: boolean;
+interface FieldOptions {
   watch?: boolean;
-};
+}
 
 type Fields = Record<string, [(string | boolean | number)?, ValidatorFn[]?]>;
 
-type Options = {
+interface Options {
   onSubmit: (values: Record<string, FieldType>) => void;
-};
+}
 
 export const useForm = <FormFields extends Fields>(fields: FormFields, options?: Options) => {
   const formRef = useRef<HTMLFormElement>(null);
-  const { setup, state, change, markAsTouched, disable, enable, setErrors, getField } =
-    useFormState<keyof FormFields>();
+  const { setup, state, change, markAsTouched, disable, enable, setErrors, getFieldState, setWatchStatus } =
+    useFormState<keyof FormFields & string>();
   const { registerValidator, validate } = useValidators();
+  const fieldsOptionsRef = useRef<Record<string, FieldOptions>>({});
 
   const values = Object.entries(state.fields)
     .map(([key, fieldState]) => ({
@@ -63,17 +64,24 @@ export const useForm = <FormFields extends Fields>(fields: FormFields, options?:
       event.preventDefault();
 
       const isValid = Object.entries(state.fields)
-        .map(([, fieldState]) => (fieldState as any).hasError)
+        .map(([field, fieldState]) => {
+          if (!fieldState.watch) {
+            const value = getFieldByFormRef(field)?.value;
+            setErrors(field, validate(field, value));
+            change(field, value);
+          }
+          return (fieldState as any).hasError;
+        })
         .every((hasError) => !hasError);
 
       if (isValid && options?.onSubmit) {
         options?.onSubmit(values);
       }
     },
-    [state.fields, values, options]
+    [state.fields]
   );
 
-  useEffect(() => {
+  useRunOnce(() => {
     const initialState = Object.entries(fields).map(([name, [value, validators]]) => {
       if (validators?.length) {
         registerValidator({ [name]: validators });
@@ -92,7 +100,11 @@ export const useForm = <FormFields extends Fields>(fields: FormFields, options?:
     });
 
     setup(initialState);
-  }, [formRef.current]);
+
+    Object.entries(fieldsOptionsRef.current).forEach(([field, options]) => {
+      setWatchStatus(field, Boolean(options?.watch));
+    });
+  }, [formRef.current, fieldsOptionsRef]);
 
   return {
     all: state,
@@ -101,48 +113,55 @@ export const useForm = <FormFields extends Fields>(fields: FormFields, options?:
       onSubmit: onSubmitCallback,
       ref: formRef,
     },
-    field: (field: keyof FormFields, options?: FieldOptions) => ({
-      name: getField(field)?.name,
-      onBlur: onBlurCallback,
-      disabled: getField(field)?.disabled,
-      ...(options?.watch
-        ? {
-            onChange: onChangeCallback,
-            value: getField(field)?.value ?? '',
-          }
-        : {
-            defaultValue: getField(field)?.value,
-          }),
-    }),
-    radio: (field: keyof FormFields, value: string, options?: Omit<FieldOptions, 'watch'>) => ({
+    field: (field: keyof FormFields & string, options?: FieldOptions) => {
+      fieldsOptionsRef.current = {
+        ...fieldsOptionsRef.current,
+        [field]: options ?? {},
+      };
+      return {
+        name: getFieldState(field)?.name,
+        onBlur: onBlurCallback,
+        disabled: getFieldState(field)?.disabled,
+        ...(options?.watch
+          ? {
+              onChange: onChangeCallback,
+              value: (getFieldState(field)?.value ?? '') as any,
+            }
+          : {
+              defaultValue: getFieldState(field)?.value,
+            }),
+      };
+    },
+    radio: (field: keyof FormFields & string, value: string) => ({
       type: 'radio',
-      name: getField(field)?.name,
+      name: getFieldState(field)?.name,
       onChange: onChangeCallback,
       onBlur: onBlurCallback,
       value,
-      checked: getField(field)?.value === value,
-      disabled: getField(field)?.disabled,
+      checked: getFieldState(field)?.value === value,
+      disabled: getFieldState(field)?.disabled,
     }),
-    checkbox: (field: keyof FormFields, options?: Omit<FieldOptions, 'watch'>) => ({
+    checkbox: (field: keyof FormFields & string) => ({
       type: 'checkbox',
-      name: getField(field)?.name,
+      name: getFieldState(field)?.name,
       onChange: onChangeCallback,
       onBlur: onBlurCallback,
       value: undefined,
-      checked: !!getField(field)?.value,
-      disabled: getField(field)?.disabled,
+      checked: !!getFieldState(field)?.value,
+      disabled: getFieldState(field)?.disabled,
     }),
-    get: (field: keyof FormFields) => ({
-      ...getField(field),
+    get: (field: keyof FormFields & string) => ({
+      ...getFieldState(field),
       disable: () => disable(field),
       enable: () => enable(field),
-      value: () => {
+      valueByRef: () => {
         const value = getFieldByFormRef(field)?.value;
+        setErrors(field, validate(field, value));
         change(state.fields[field].name, value);
 
         return value;
       },
     }),
-    value: (field: keyof FormFields) => getField(field)?.value ?? '',
+    value: (field: keyof FormFields & string) => getFieldState(field)?.value ?? '',
   };
 };

@@ -16,7 +16,7 @@ export interface FieldState {
   disabled: boolean;
   hasError: boolean;
   errors: Record<string, boolean> | null;
-  watch: boolean;
+  watch?: boolean;
 }
 
 export interface State {
