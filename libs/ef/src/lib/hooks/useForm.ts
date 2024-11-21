@@ -128,7 +128,7 @@ export const useForm = <FormFields extends Fields>(fields: FormFields, options?:
               value: (getFieldState(field)?.value ?? '') as any,
             }
           : {
-              defaultValue: getFieldState(field)?.value,
+              defaultValue: getFieldState(field)?.value as any,
             }),
       };
     },
