@@ -41,10 +41,10 @@ export const useForm = <FormFields extends Fields>(fields: FormFields, options?:
   const onChangeCallback = useCallback(
     (event: ChangeEvent<HTMLInputElement>) => {
       const { name } = event.target;
-      const { value } = pickValue(event);
+      const { value, files } = pickValue(event);
 
       setErrors(name, validate(name, value));
-      change(name, value);
+      change(name, files ?? value);
     },
     [validate, change, setErrors]
   );
@@ -132,6 +132,13 @@ export const useForm = <FormFields extends Fields>(fields: FormFields, options?:
             }),
       };
     },
+    file: (field: keyof FormFields & string) => ({
+      type: 'file',
+      name: getFieldState(field)?.name,
+      onBlur: onBlurCallback,
+      disabled: getFieldState(field)?.disabled,
+      onChange: onChangeCallback,
+    }),
     radio: (field: keyof FormFields & string, value: string) => ({
       type: 'radio',
       name: getFieldState(field)?.name,

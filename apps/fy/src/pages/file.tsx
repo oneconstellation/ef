@@ -3,7 +3,7 @@ import { useForm } from '@oneconstellation/ef';
 export const FileDemoPage = () => {
   const form = useForm(
     {
-      file: [],
+      avatar: [],
     },
     {
       onSubmit(values) {
@@ -24,7 +24,7 @@ export const FileDemoPage = () => {
                   <div className="form-field">
                     <label className="form-label">Photo</label>
                     <div className="form-control">
-                      <input type="file" className="input-file" {...form.field('file')} />
+                      <input className="input-file" multiple {...form.file('avatar', { watch: false })} />
                     </div>
                   </div>
                   <div className="form-field pt-5">

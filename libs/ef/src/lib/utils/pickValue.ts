@@ -1,10 +1,7 @@
 import { ChangeEvent } from 'react';
 
-export const pickValue = <T extends HTMLInputElement>(
-  event: ChangeEvent<T>
-) => {
-  const { type, value, valueAsDate, valueAsNumber, checked } =
-    event.target as T;
+export const pickValue = <T extends HTMLInputElement>(event: ChangeEvent<T>) => {
+  const { type, value, valueAsDate, valueAsNumber, checked, files } = event.target as T;
 
   if (isDateTargetType(type)) {
     return { value, asDate: valueAsDate ?? undefined };
@@ -16,6 +13,10 @@ export const pickValue = <T extends HTMLInputElement>(
 
   if (isCheckboxTargetType(type)) {
     return { value: checked ? true : false };
+  }
+
+  if (isFileTargetValue(type)) {
+    return { value, files };
   }
 
   return { value };
@@ -46,6 +47,15 @@ const isNumberTargetType = (type: string): boolean => {
 const isCheckboxTargetType = (type: string): boolean => {
   switch (type) {
     case 'checkbox':
+      return true;
+    default:
+      return false;
+  }
+};
+
+const isFileTargetValue = (type: string): boolean => {
+  switch (type) {
+    case 'file':
       return true;
     default:
       return false;
