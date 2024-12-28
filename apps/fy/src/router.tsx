@@ -19,6 +19,10 @@ export const router = createBrowserRouter([
         path: '/range',
         element: <Page.RangeDemoPage />,
       },
+      {
+        path: '/text',
+        element: <Page.TextDemoPage />,
+      },
     ],
   },
 ]);

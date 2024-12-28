@@ -42,6 +42,14 @@ export function App() {
                       </li>
                     )}
                   </NavLink>
+                  <NavLink to={'/text'}>
+                    {({ isActive }) => (
+                      <li className={`menu-item ${isActive && 'menu-active'}`}>
+                        <IconDirectionSignFilled />
+                        <span>Text</span>
+                      </li>
+                    )}
+                  </NavLink>
                 </ul>
               </section>
             </nav>
