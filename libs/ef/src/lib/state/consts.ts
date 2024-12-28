@@ -1,6 +1,8 @@
 export const SETUP = 'SETUP';
 export const CHANGE = 'CHANGE';
 export const TOUCH = 'TOUCH';
+export const MAKE_IT_PRISTINE = 'MAKE_IT_PRISTINE';
+export const MAKE_IT_DIRTY = 'MAKE_IT_DIRTY';
 export const DISABLE = 'DISABLE';
 export const ENABLE = 'ENABLE';
 export const SET_ERRORS = 'SET_ERRORS';

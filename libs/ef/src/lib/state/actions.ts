@@ -9,3 +9,5 @@ export const Enable = (payload: { field: string }) => createAction(A.ENABLE, pay
 export const SetErrors = (payload: { field: string; errors: Record<string, boolean> }) =>
   createAction(A.SET_ERRORS, payload);
 export const SetWatch = (payload: { field: string; watch: boolean }) => createAction(A.WATCH, payload);
+export const SetPristine = (payload: { field: string }) => createAction(A.MAKE_IT_PRISTINE, payload);
+export const SetDirty = (payload: { field: string }) => createAction(A.MAKE_IT_DIRTY, payload);

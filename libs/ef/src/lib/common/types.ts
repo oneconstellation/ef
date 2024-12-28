@@ -13,6 +13,8 @@ export interface FieldState {
   name: string;
   value: FieldType;
   touched: boolean;
+  pristine: boolean;
+  dirty: boolean;
   disabled: boolean;
   hasError: boolean;
   errors: Record<string, boolean> | null;

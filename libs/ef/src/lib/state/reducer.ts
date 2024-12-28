@@ -8,10 +8,11 @@ const createFieldState = (
     name: field.name,
     value: field.value,
     touched: false,
+    pristine: true,
+    dirty: false,
     disabled: field?.disabled ?? false,
     hasError: field.hasError ?? false,
     errors: field.errors ?? null,
-    // watch: field.watch ?? true,
   };
 };
 
@@ -103,6 +104,32 @@ export function reducer(state: State, action: { type: string; payload: any }) {
           [action.payload.field]: {
             ...state.fields[action.payload.field],
             watch: action.payload.watch,
+          },
+        },
+      };
+
+    case Action.MAKE_IT_DIRTY:
+      return {
+        ...state,
+        fields: {
+          ...state.fields,
+          [action.payload.field]: {
+            ...state.fields[action.payload.field],
+            dirty: true,
+            pristine: false,
+          },
+        },
+      };
+
+    case Action.MAKE_IT_PRISTINE:
+      return {
+        ...state,
+        fields: {
+          ...state.fields,
+          [action.payload.field]: {
+            ...state.fields[action.payload.field],
+            pristine: true,
+            dirty: false,
           },
         },
       };

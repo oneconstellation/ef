@@ -16,5 +16,7 @@ export const useFormState = <T extends string>() => {
     enable: (field: T) => dispatch(Actions.Enable({ field })),
     setErrors: (field: T, errors: Record<string, boolean>) => dispatch(Actions.SetErrors({ field, errors })),
     setWatchStatus: (field: T, watch: boolean) => dispatch(Actions.SetWatch({ field, watch })),
+    SetPristine: (field: T) => dispatch(Actions.SetPristine({ field })),
+    SetDirty: (field: T) => dispatch(Actions.SetDirty({ field })),
   };
 };

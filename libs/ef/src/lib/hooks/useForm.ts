@@ -1,4 +1,4 @@
-import { ChangeEvent, useCallback, FocusEvent, FormEvent, useRef } from 'react';
+import { ChangeEvent, useCallback, FocusEvent, FormEvent, useRef, useState } from 'react';
 import { pickValue } from '../utils/pickValue';
 import { useFormState } from './useFormState';
 import { useValidators } from './useValidators';
@@ -17,7 +17,7 @@ interface Options {
 
 export const useForm = <FormFields extends Fields>(fields: FormFields, options?: Options) => {
   const formRef = useRef<HTMLFormElement>(null);
-  const { setup, state, change, markAsTouched, disable, enable, setErrors, getFieldState, setWatchStatus } =
+  const { setup, state, change, markAsTouched, disable, enable, setErrors, getFieldState, setWatchStatus, SetDirty } =
     useFormState<keyof FormFields & string>();
   const { registerValidator, validate } = useValidators();
   const fieldsOptionsRef = useRef<Record<string, FieldOptions>>({});
@@ -45,11 +45,15 @@ export const useForm = <FormFields extends Fields>(fields: FormFields, options?:
 
       setErrors(name, validate(name, value));
       change(name, files ?? value);
+
+      if (state.fields[name].pristine) {
+        SetDirty(name);
+      }
     },
     [validate, change, setErrors]
   );
 
-  const onBlurCallback = useCallback(
+  const onFocusCallback = useCallback(
     (event: FocusEvent<HTMLInputElement>) => {
       const field = (event.target as HTMLInputElement).name;
       if (!state.fields[field].touched) {
@@ -120,7 +124,7 @@ export const useForm = <FormFields extends Fields>(fields: FormFields, options?:
       };
       return {
         name: getFieldState(field)?.name,
-        onBlur: onBlurCallback,
+        onFocus: onFocusCallback,
         disabled: getFieldState(field)?.disabled,
         ...(options?.watch
           ? {
@@ -135,7 +139,7 @@ export const useForm = <FormFields extends Fields>(fields: FormFields, options?:
     file: (field: keyof FormFields & string) => ({
       type: 'file',
       name: getFieldState(field)?.name,
-      onBlur: onBlurCallback,
+      onFocus: onFocusCallback,
       disabled: getFieldState(field)?.disabled,
       onChange: onChangeCallback,
     }),
@@ -143,7 +147,7 @@ export const useForm = <FormFields extends Fields>(fields: FormFields, options?:
       type: 'radio',
       name: getFieldState(field)?.name,
       onChange: onChangeCallback,
-      onBlur: onBlurCallback,
+      onFocus: onFocusCallback,
       value,
       checked: getFieldState(field)?.value === value,
       disabled: getFieldState(field)?.disabled,
@@ -152,7 +156,7 @@ export const useForm = <FormFields extends Fields>(fields: FormFields, options?:
       type: 'checkbox',
       name: getFieldState(field)?.name,
       onChange: onChangeCallback,
-      onBlur: onBlurCallback,
+      onFocus: onFocusCallback,
       value: undefined,
       checked: !!getFieldState(field)?.value,
       disabled: getFieldState(field)?.disabled,
