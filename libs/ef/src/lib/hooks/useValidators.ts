@@ -16,19 +16,15 @@ export const useValidators = () => {
   };
 
   const validate = (field: string, value: any): Record<string, boolean> => {
-    if (hasValidator(field)) {
-      return validators.current[field].reduce((accumulator, fn) => {
-        const { hasError, name } = fn(value);
+    return (validators.current[field] || []).reduce((accumulator, fn) => {
+      const { hasError, name } = fn(value);
 
-        return {
-          ...accumulator,
-          [name]: hasError,
-        };
-      }, {});
-    }
-
-    return {};
+      return {
+        ...accumulator,
+        [name]: hasError,
+      };
+    }, {});
   };
 
-  return { registerValidator, validate };
+  return { registerValidator, validate, hasValidator };
 };

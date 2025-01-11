@@ -19,7 +19,7 @@ export const useForm = <FormFields extends Fields>(fields: FormFields, options?:
   const formRef = useRef<HTMLFormElement>(null);
   const { setup, state, change, markAsTouched, disable, enable, setErrors, getFieldState, setWatchStatus, SetDirty } =
     useFormState<keyof FormFields & string>();
-  const { registerValidator, validate } = useValidators();
+  const { registerValidator, validate, hasValidator } = useValidators();
   const fieldsOptionsRef = useRef<Record<string, FieldOptions>>({});
 
   const values = Object.entries(state.fields)
@@ -35,7 +35,7 @@ export const useForm = <FormFields extends Fields>(fields: FormFields, options?:
     );
 
   const getFieldByFormRef = (field: keyof FormFields) => {
-    return formRef.current?.elements.namedItem(field as string) as HTMLInputElement;
+    return formRef.current?.elements.namedItem(field as string) as HTMLInputElement | null;
   };
 
   const onChangeCallback = useCallback(
@@ -43,7 +43,10 @@ export const useForm = <FormFields extends Fields>(fields: FormFields, options?:
       const { name } = event.target;
       const { value, files } = pickValue(event);
 
-      setErrors(name, validate(name, value));
+      if (hasValidator(name)) {
+        setErrors(name, validate(name, value));
+      }
+
       change(name, files ?? value);
 
       if (state.fields[name].pristine) {
