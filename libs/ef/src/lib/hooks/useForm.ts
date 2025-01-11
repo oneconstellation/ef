@@ -136,6 +136,13 @@ export const useForm = <FormFields extends Fields>(fields: FormFields, options?:
             }
           : {
               defaultValue: getFieldState(field)?.value as any,
+              onChange: (event: ChangeEvent<HTMLInputElement>) => {
+                const { name } = event.target;
+                
+                if (state.fields[name].pristine) {
+                  SetDirty(name);
+                }
+              }
             }),
       };
     },
